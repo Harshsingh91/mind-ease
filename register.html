@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindEase — Create Account</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary:#2A6496;--primary-light:#5B9EC9;--accent:#EAF4FB;
+      --text:#1C3244;--background:#F8FBFF;--gray-light:#B8D8ED;
+      --gray-mid:#7AAECB;--gray-dark:#3A6080;--beige:#F0F7FC;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Nunito Sans',sans-serif;background:var(--beige);color:var(--text);min-height:100vh;overflow-x:hidden;}
+    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+    nav{position:fixed;top:0;width:100%;padding:18px 60px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:rgba(248,251,255,0.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--gray-light);}
+    .logo{font-size:1.45rem;font-weight:900;color:var(--text);letter-spacing:-0.04em;text-decoration:none;}
+    .logo span{color:var(--primary-light);font-style:italic;font-weight:300;}
+    .nav-back{text-decoration:none;font-size:0.85rem;color:var(--gray-dark);display:flex;align-items:center;gap:7px;font-weight:500;transition:color .3s;}
+    .nav-back:hover{color:var(--primary);}
+    .nav-back:hover .arrow{transform:translateX(-3px);}
+    .arrow{display:inline-block;transition:transform .3s;}
+    .page{min-height:100vh;display:flex;position:relative;z-index:1;}
+    .left-panel{flex:1;background:linear-gradient(145deg,#1C3244 0%,#2A6496 55%,#5B9EC9 100%);display:flex;flex-direction:column;justify-content:center;padding:80px 60px;position:relative;overflow:hidden;}
+    @media(max-width:768px){.left-panel{display:none;}}
+    .left-panel::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+    .panel-quote{font-size:2.2rem;font-weight:800;color:#fff;line-height:1.25;letter-spacing:-0.03em;margin-bottom:24px;position:relative;}
+    .panel-quote span{color:var(--gray-light);font-style:italic;font-weight:300;}
+    .panel-sub{font-size:1rem;color:rgba(255,255,255,0.65);font-weight:300;line-height:1.7;max-width:380px;}
+    .panel-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px;}
+    .pill{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:50px;padding:8px 18px;font-size:0.8rem;color:rgba(255,255,255,0.85);backdrop-filter:blur(4px);}
+    .panel-deco{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;}
+    .pd1{width:300px;height:300px;background:rgba(91,158,201,0.25);bottom:-80px;right:-80px;}
+    .pd2{width:200px;height:200px;background:rgba(184,216,237,0.15);top:60px;left:-40px;}
+    .t-ava-prev{font-size:1.8rem;}
+    .t-name-prev{font-size:0.85rem;font-weight:700;color:white;}
+    .t-spec-prev{font-size:0.68rem;color:rgba(255,255,255,0.45);margin-top:2px;}
+    .t-badge-prev{margin-left:auto;font-size:0.62rem;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);padding:3px 9px;border-radius:50px;white-space:nowrap;}
+    .right-panel{width:540px;display:flex;align-items:center;justify-content:center;padding:100px 50px 60px;background:rgba(248,251,255,0.75);backdrop-filter:blur(6px);}
+    @media(max-width:768px){.right-panel{width:100%;padding:100px 24px 60px;}}
+    .auth-card{width:100%;max-width:420px;opacity:0;animation:card-in .65s .15s cubic-bezier(.34,1.2,.64,1) forwards;}
+    @keyframes card-in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .auth-eyebrow{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--primary-light);margin-bottom:10px;}
+    .auth-title{font-size:2.1rem;font-weight:900;letter-spacing:-.04em;color:var(--text);line-height:1.1;margin-bottom:8px;}
+    .auth-sub{font-size:0.9rem;color:var(--gray-mid);font-weight:300;margin-bottom:28px;}
+    .form-group{margin-bottom:18px;}
+    .form-label{display:block;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-dark);margin-bottom:7px;}
+    .input-wrap{position:relative;}
+    .input-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;color:var(--gray-mid);pointer-events:none;transition:color .3s;display:flex;align-items:center;}
+    .form-input{width:100%;padding:13px 14px 13px 44px;border:1.5px solid rgba(184,216,237,.55);border-radius:12px;font-size:.93rem;font-family:'Nunito Sans',sans-serif;color:var(--text);background:rgba(240,247,252,.6);transition:all .3s;outline:none;}
+    .form-input:focus{border-color:var(--primary-light);background:#fff;box-shadow:0 0 0 4px rgba(91,158,201,.1);}
+    .pwd-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-mid);padding:4px;line-height:1;transition:color .3s;font-size:.85rem;}
+    .pwd-toggle:hover{color:var(--primary);}
+    .t-ava{font-size:1.4rem;flex-shrink:0;}
+    .t-info{flex:1;overflow:hidden;}
+    .t-name{font-size:0.76rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .t-spec{font-size:0.62rem;color:var(--gray-mid);margin-top:1px;}
+    .t-radio{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--gray-light);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+    .random-btn{width:100%;margin-top:8px;padding:9px;background:none;border:1.5px dashed rgba(184,216,237,.8);border-radius:12px;font-family:'Nunito Sans',sans-serif;font-size:0.8rem;color:var(--gray-mid);cursor:pointer;transition:all .2s;}
+    .random-btn:hover{border-color:var(--primary-light);color:var(--primary);background:var(--accent);}
+    .btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;font-family:'Nunito Sans',sans-serif;cursor:pointer;transition:all .3s;box-shadow:0 8px 24px rgba(42,100,150,.28);display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(42,100,150,.4);}
+    .btn-primary:active{transform:translateY(0);}
+    .btn-primary:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+    .error-msg{background:rgba(220,53,69,.08);border:1px solid rgba(220,53,69,.25);border-radius:10px;padding:10px 14px;font-size:.83rem;color:#c0392b;margin-bottom:16px;display:none;}
+    .error-msg.show{display:block;animation:shake .4s;}
+    .success-msg{background:rgba(45,158,92,.08);border:1px solid rgba(45,158,92,.25);border-radius:10px;padding:10px 14px;font-size:.83rem;color:#1e7a45;margin-bottom:16px;display:none;}
+    .success-msg.show{display:block;}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+    .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .auth-footer{text-align:center;font-size:.83rem;color:var(--gray-mid);margin-top:20px;}
+    .auth-footer a{color:var(--primary);text-decoration:none;font-weight:700;}
+    .auth-footer a:hover{color:var(--primary-light);}
+
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+
+<nav>
+  <a href="home.html" class="logo">Mind<span>Ease</span></a>
+  <a href="sign.html" class="nav-back"><span class="arrow">←</span> Back to Sign In</a>
+</nav>
+
+<div class="page">
+  <div class="left-panel">
+    <div class="panel-deco pd1"></div>
+    <div class="panel-deco pd2"></div>
+    <div class="panel-quote">Begin your<br /><span>healing journey.</span></div>
+    <p class="panel-sub">A new thought to carry with you today. Come back tomorrow for a fresh perspective.</p>
+    <div class="panel-pills">
+      <span class="pill">💙 Licensed Therapists</span>
+      <span class="pill">📊 Mood Tracking</span>
+      <span class="pill">🔒 100% Private</span>
+      <span class="pill">⚡ Same-Day Sessions</span>
+    </div>
+    <div class="quote-block" id="leftQuote">
+      <div class="quote-mark">"</div>
+      <div class="quote-text" id="leftQuoteText">Loading…</div>
+      <div class="quote-author" id="leftQuoteAuthor">— MindEase</div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="auth-card">
+      <p class="auth-eyebrow">New to MindEase</p>
+      <h1 class="auth-title">Create your<br />account</h1>
+      <p class="auth-sub">Free forever · No credit card needed</p>
+
+      <div class="error-msg" id="errorMsg"></div>
+      <div class="success-msg" id="successMsg">✅ Account created! Please sign in to continue…</div>
+
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="9" cy="6" r="3"/><path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6"/>
+          </svg>
+          <input class="form-input" type="text" id="name" placeholder="Alex Johnson" autocomplete="name" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="14" height="11" rx="2"/><path d="M2 7l7 4 7-4"/>
+          </svg>
+          <input class="form-input" type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="4" y="8" width="10" height="8" rx="2"/><path d="M6 8V6a3 3 0 016 0v2"/>
+          </svg>
+          <input class="form-input" type="password" id="password" placeholder="Min. 4 characters" autocomplete="new-password" />
+          <button type="button" class="pwd-toggle" id="pwdBtn">👁</button>
+        </div>
+      </div>
+
+
+
+      <button type="button" class="btn-primary" id="registerBtn" onclick="doRegister()">
+        Create Account
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <p class="auth-footer">Already have an account? <a href="sign.html">Sign in →</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  if (sessionStorage.getItem('me_token')) window.location.href = 'dashboard.html';
+  document.getElementById('pwdBtn').addEventListener('click', function () {
+    const i = document.getElementById('password');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    this.textContent = i.type === 'password' ? '👁' : '🙈';
+  });
+
+  async function doRegister() {
+    const name     = document.getElementById('name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorMsg   = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const btn = document.getElementById('registerBtn');
+    errorMsg.classList.remove('show');
+    successMsg.classList.remove('show');
+    if (!name)                          { showError('Please enter your full name.'); return; }
+    if (!email)                         { showError('Please enter your email address.'); return; }
+    if (!password || password.length<4) { showError('Password must be at least 4 characters.'); return; }
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Creating account…';
+    try {
+      const res  = await fetch('http://localhost:3000/signup', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Don't save token — send to login so quiz flow starts properly
+        successMsg.classList.add('show');
+        setTimeout(() => window.location.href = 'sign.html', 1400);
+      } else {
+        showError(data.message || 'Could not create account. Please try again.');
+        resetBtn();
+      }
+    } catch (err) {
+      showError('Cannot connect to server. Make sure it is running on port 3000.');
+      resetBtn();
+    }
+  }
+
+  function showError(msg) {
+    const e = document.getElementById('errorMsg');
+    e.textContent = msg; e.classList.add('show');
+  }
+  function resetBtn() {
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = false;
+    btn.innerHTML = 'Create Account <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doRegister(); } });
+</script>
+
+<script>
+  const canvas = document.getElementById('particle-canvas');
+  if (canvas) {
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (gl) {
+      const resize = () => { canvas.width=window.innerWidth; canvas.height=window.innerHeight; gl.viewport(0,0,canvas.width,canvas.height); };
+      resize(); window.addEventListener('resize', resize);
+      const vs=`attribute vec2 position; void main(){ gl_Position=vec4(position,0.0,1.0); }`;
+      const fs=`precision highp float; uniform float uTime; uniform vec2 uResolution; uniform float uHueShift; uniform float uWarp;
+        vec3 hueShiftRGB(vec3 col,float deg){float r=radians(deg);float c=cos(r);float s=sin(r);return col*mat3(0.299+0.701*c+0.168*s,0.299-0.299*c-0.328*s,0.299-0.299*c+1.250*s,0.587-0.587*c+0.330*s,0.587+0.413*c+0.035*s,0.587-0.587*c-1.050*s,0.114-0.114*c-0.497*s,0.114-0.114*c+0.292*s,0.114+0.886*c-0.203*s);}
+        vec4 sigmoid(vec4 x){return 1.0/(1.0+exp(-x));}
+        vec4 cppn_fn(vec2 xy,float t1,float t2,float t3){vec4 buf[8];buf[0]=vec4(xy,length(xy),atan(xy.y,xy.x));buf[1]=vec4(t1,t2,t3,0.);buf[2]=vec4(sin(3.14159*buf[0]));buf[3]=vec4(cos(3.14159*buf[0]));buf[4]=sigmoid(buf[0]);buf[5]=vec4(buf[0].x*buf[0].y,buf[0].z*buf[1].x,buf[0].w*buf[1].y,buf[2].x*buf[3].y);buf[6]=mat4(vec4(2.4,-1.2,0.8,-0.4),vec4(-1.8,3.1,-0.9,0.6),vec4(0.7,-1.4,2.8,-1.1),vec4(-0.3,0.9,-1.6,2.2))*buf[0]+mat4(vec4(-1.1,0.5,-0.7,1.3),vec4(0.8,-2.1,1.4,-0.6),vec4(-0.4,1.2,-1.9,0.8),vec4(1.6,-0.8,0.5,-1.7))*buf[1]+vec4(0.1,-0.3,0.5,-0.2);buf[7]=mat4(vec4(-8.265602,-4.7027016,5.098234,0.7509808),vec4(8.6507845,-17.15949,16.51939,-8.884479),vec4(-4.036479,-2.3946867,-2.6055532,-1.9866527),vec4(-2.2167742,-1.8135649,-5.9759874,4.8846445))*buf[0]+mat4(vec4(6.7790847,3.5076547,-2.8191125,-2.7028968),vec4(-5.743024,-0.27844876,1.4958696,-5.0517144),vec4(13.122226,15.735168,-2.9397483,-4.101023),vec4(-14.375265,-5.030483,-6.2599335,2.9848232))*buf[1]+vec4(2.2415268,-6.705987,-0.98861027,-2.117676);buf[6]=sigmoid(buf[6]);buf[7]=sigmoid(buf[7]);buf[0]=mat4(vec4(1.6794263,1.3817469,2.9625452,0.),vec4(-1.8834411,-1.4806935,-3.5924516,0.),vec4(-1.3279216,-1.0918057,-2.3124623,0.),vec4(0.2662234,0.23235129,0.44178495,0.))*buf[0]+mat4(vec4(-0.6299101,-0.5945583,-0.9125601,0.),vec4(0.17828953,0.18300213,0.18182953,0.),vec4(-2.96544,-2.5819945,-4.9001055,0.),vec4(1.4195864,1.1868085,2.5176322,0.))*buf[1]+mat4(vec4(-1.2584374,-1.0552157,-2.1688404,0.),vec4(-0.7200217,-0.52666044,-1.438251,0.),vec4(0.15345335,0.15196142,0.272854,0.),vec4(0.945728,0.8861938,1.2766753,0.))*buf[2]+mat4(vec4(-2.4218085,-1.968602,-4.35166,0.),vec4(-22.683098,-18.0544,-41.954372,0.),vec4(0.63792,0.5470648,1.1078634,0.),vec4(-1.5489894,-1.3075932,-2.6444845,0.))*buf[3]+mat4(vec4(-0.49252132,-0.39877754,-0.91366625,0.),vec4(0.95609266,0.7923952,1.640221,0.),vec4(0.30616966,0.15693925,0.8639857,0.),vec4(1.1825981,0.94504964,2.176963,0.))*buf[4]+mat4(vec4(0.35446745,0.3293795,0.59547555,0.),vec4(-0.58784515,-0.48177817,-1.0614829,0.),vec4(2.5271258,1.9991658,4.6846647,0.),vec4(0.13042648,0.08864098,0.30187556,0.))*buf[5]+mat4(vec4(-1.7718065,-1.4033192,-3.3355875,0.),vec4(3.1664357,2.638297,5.378702,0.),vec4(-3.1724713,-2.6107926,-5.549295,0.),vec4(-2.851368,-2.249092,-5.3013067,0.))*buf[6]+mat4(vec4(1.5203838,1.2212278,2.8404984,0.),vec4(1.5210563,1.2651345,2.683903,0.),vec4(2.9789467,2.4364579,5.2347264,0.),vec4(2.2270417,1.8825914,3.8028636,0.))*buf[7]+vec4(-1.5468478,-3.6171484,0.24762098,0.);buf[0]=sigmoid(buf[0]);return vec4(buf[0].x,buf[0].y,buf[0].z,1.0);}
+        void mainImage(out vec4 fragColor,in vec2 fragCoord){vec2 uv=fragCoord/uResolution.xy*2.0-1.0;uv.y*=-1.0;uv+=uWarp*vec2(sin(uv.y*6.283+uTime*0.5),cos(uv.x*6.283+uTime*0.5))*0.05;fragColor=cppn_fn(uv,0.1*sin(0.3*uTime),0.1*sin(0.69*uTime),0.1*sin(0.44*uTime));}
+        void main(){vec4 col;mainImage(col,gl_FragCoord.xy);col.rgb=hueShiftRGB(col.rgb,uHueShift);col.rgb=mix(col.rgb,vec3(1.0),0.62);gl_FragColor=vec4(clamp(col.rgb,0.0,1.0),1.0);}`;
+      function compile(t,s){const sh=gl.createShader(t);gl.shaderSource(sh,s);gl.compileShader(sh);return sh;}
+      const prog=gl.createProgram();gl.attachShader(prog,compile(gl.VERTEX_SHADER,vs));gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);
+      const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+      const pos=gl.getAttribLocation(prog,'position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+      const uT=gl.getUniformLocation(prog,'uTime'),uR=gl.getUniformLocation(prog,'uResolution');
+      gl.uniform1f(gl.getUniformLocation(prog,'uHueShift'),195.0);gl.uniform1f(gl.getUniformLocation(prog,'uWarp'),0.6);
+      const start=performance.now();
+      function frame(){const t=((performance.now()-start)/1000);gl.uniform1f(uT,t);gl.uniform2f(uR,canvas.width,canvas.height);gl.drawArrays(gl.TRIANGLES,0,3);requestAnimationFrame(frame);}
+      frame();
+    }
+  }
+</script>
+</body>
+</html>

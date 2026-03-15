@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MindEase — Daily Check-in</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{--primary:#2A6496;--pl:#5B9EC9;--accent:#EAF4FB;--text:#1C3244;--bg:#F8FBFF;--gl:#B8D8ED;--gm:#7AAECB;--gd:#3A6080;--beige:#F0F7FC;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* BG */
+.bg{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#1C3244 0%,#2A6496 55%,#5B9EC9 100%);overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;}
+.o1{width:500px;height:500px;background:rgba(91,158,201,.28);top:-120px;right:-100px;animation:drift1 12s ease-in-out infinite alternate;}
+.o2{width:380px;height:380px;background:rgba(28,45,61,.5);bottom:-100px;left:-80px;animation:drift2 10s ease-in-out infinite alternate;}
+.o3{width:220px;height:220px;background:rgba(184,216,237,.12);top:45%;left:35%;animation:drift1 14s ease-in-out infinite alternate;}
+@keyframes drift1{to{transform:translate(30px,20px);}}
+@keyframes drift2{to{transform:translate(-20px,-30px);}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(28,45,61,.45);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07);}
+.logo{font-size:1.3rem;font-weight:900;color:white;letter-spacing:-.04em;text-decoration:none;}
+.logo em{color:var(--gl);font-style:italic;font-weight:300;}
+.nav-badge{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:4px 12px;}
+
+/* SHELL */
+.shell{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 20px 40px;}
+
+/* CARD */
+.card{width:100%;max-width:640px;background:rgba(255,255,255,.97);border-radius:28px;box-shadow:0 40px 100px rgba(0,0,0,.22);overflow:hidden;animation:card-in .5s cubic-bezier(.34,1.2,.64,1) both;}
+@keyframes card-in{from{opacity:0;transform:translateY(30px) scale(.97)}to{opacity:1;transform:none}}
+
+/* PROGRESS */
+.prog-bar{height:5px;background:rgba(184,216,237,.25);}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--pl));border-radius:0 3px 3px 0;transition:width .5s cubic-bezier(.34,1.2,.64,1);}
+
+/* QUESTION */
+.q-body{padding:36px 40px 28px;}
+.q-meta{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.q-num{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--pl);}
+.q-tag{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px;border-radius:50px;}
+.tag-mh{background:#EAF4FB;color:var(--primary);}
+.tag-ps{background:#f0eafa;color:#7c3aed;}
+.tag-ls{background:#e8f7ee;color:#2d9e5c;}
+.tag-br{background:#fff0e0;color:#c05621;}
+.q-text{font-size:1.3rem;font-weight:800;color:var(--text);line-height:1.35;letter-spacing:-.025em;margin-bottom:26px;}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt{display:flex;align-items:center;gap:13px;padding:13px 16px;border-radius:13px;border:1.5px solid rgba(184,216,237,.5);background:var(--beige);cursor:pointer;transition:all .17s ease;font-family:'Nunito Sans',sans-serif;font-size:.88rem;color:var(--text);text-align:left;width:100%;}
+.opt:hover{border-color:var(--pl);background:var(--accent);transform:translateX(4px);}
+.opt.sel{border-color:var(--primary);background:var(--accent);box-shadow:0 0 0 3px rgba(42,100,150,.1);transform:translateX(4px);}
+.opt-key{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;background:rgba(184,216,237,.35);color:var(--gd);transition:all .17s;}
+.opt.sel .opt-key{background:var(--primary);color:white;}
+
+/* FOOTER */
+.q-footer{display:flex;align-items:center;justify-content:space-between;padding:0 40px 32px;}
+.dots{display:flex;gap:5px;}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(184,216,237,.35);transition:all .3s;}
+.dot.done{background:var(--pl);}
+.dot.active{background:var(--primary);transform:scale(1.35);}
+.btn-next{padding:12px 28px;border-radius:50px;background:linear-gradient(135deg,var(--primary),var(--pl));color:white;border:none;font-family:'Nunito Sans',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;box-shadow:0 6px 20px rgba(42,100,150,.28);transition:all .2s;opacity:.3;pointer-events:none;}
+.btn-next.on{opacity:1;pointer-events:all;}
+.btn-next.on:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(42,100,150,.38);}
+
+/* THINKING SCREEN */
+#thinkScreen{display:none;padding:60px 40px;text-align:center;}
+.think-icon{font-size:3rem;margin-bottom:18px;animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.12);opacity:.7}}
+.think-title{font-size:1.4rem;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.02em;}
+.think-sub{font-size:.88rem;color:var(--gm);margin-bottom:32px;}
+.think-steps{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;}
+.think-step{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:12px;background:var(--beige);border:1px solid rgba(184,216,237,.4);font-size:.83rem;color:var(--gd);opacity:.35;transition:all .5s;}
+.think-step.active{opacity:1;background:var(--accent);border-color:rgba(91,158,201,.4);}
+.think-step.complete{opacity:1;color:var(--primary);}
+.step-icon{font-size:1rem;width:20px;text-align:center;}
+
+/* REPORT SCREEN */
+#reportScreen{display:none;}
+.report-header{background:linear-gradient(135deg,var(--primary) 0%,#1C2D3D 100%);padding:36px 40px 32px;position:relative;overflow:hidden;}
+.report-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 80% at 85% 50%,rgba(91,158,201,.2) 0%,transparent 60%);}
+.rh-inner{position:relative;z-index:1;}
+.rh-eyebrow{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.45);margin-bottom:8px;}
+.rh-title{font-size:1.6rem;font-weight:900;color:white;letter-spacing:-.03em;margin-bottom:4px;}
+.rh-sub{font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:20px;}
+.score-row{display:flex;gap:12px;flex-wrap:wrap;}
+.score-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:10px 16px;text-align:center;}
+.sc-val{font-size:1.3rem;font-weight:900;color:white;}
+.sc-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-top:1px;}
+
+.report-body{padding:28px 40px 36px;}
+.section{margin-bottom:26px;}
+.section:last-child{margin-bottom:0;}
+.sec-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--pl);margin-bottom:10px;}
+.sec-text{font-size:.9rem;color:var(--gd);line-height:1.75;font-weight:400;}
+.insight-box{background:var(--beige);border:1px solid rgba(184,216,237,.5);border-left:4px solid var(--primary);border-radius:0 12px 12px 0;padding:14px 16px;font-size:.86rem;color:var(--text);line-height:1.7;margin-top:8px;}
+.tags-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px;}
+.report-tag{font-size:.72rem;font-weight:600;padding:5px 12px;border-radius:50px;background:var(--accent);color:var(--primary);border:1px solid rgba(91,158,201,.3);}
+
+/* THERAPIST MATCH */
+.therapist-match{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,#EAF4FB,#dceef8);border:1.5px solid rgba(91,158,201,.3);border-radius:16px;padding:18px 20px;margin-top:10px;}
+.tm-ava{font-size:2.6rem;flex-shrink:0;}
+.tm-label{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--pl);margin-bottom:2px;}
+.tm-name{font-size:1rem;font-weight:800;color:var(--text);}
+.tm-spec{font-size:.76rem;color:var(--gm);margin-top:1px;}
+.tm-btn{margin-left:auto;padding:9px 18px;border-radius:50px;background:var(--primary);color:white;border:none;font-family:'Nunito Sans',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(42,100,150,.22);transition:all .2s;flex-shrink:0;}
+.tm-btn:hover{background:var(--pl);transform:translateY(-1px);}
+
+.btn-dashboard{width:100%;margin-top:24px;padding:15px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--pl));color:white;border:none;font-family:'Nunito Sans',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(42,100,150,.28);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-dashboard:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(42,100,150,.38);}
+
+
+/* AI assign reveal */
+.ai-assign-box{border-radius:16px;overflow:hidden;border:1.5px solid rgba(184,216,237,.4);}
+.ai-assign-thinking{display:flex;align-items:center;gap:14px;padding:20px;background:var(--beige);}
+.ai-spinner{width:28px;height:28px;border-radius:50%;border:3px solid rgba(42,100,150,.15);border-top-color:var(--primary);animation:spin 1s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ai-think-text{font-size:.85rem;color:var(--gd);line-height:1.5;}
+#therapistReveal{animation:reveal-in .6s cubic-bezier(.34,1.2,.64,1) both;}
+@keyframes reveal-in{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+</div>
+
+<nav>
+  <a href="home.html" class="logo">Mind<em>Ease</em></a>
+  <span class="nav-badge" id="navBadge">Daily Check-in</span>
+</nav>
+
+<div class="shell">
+  <div class="card" id="mainCard">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+    <!-- QUESTION SCREEN -->
+    <div id="qScreen">
+      <div class="q-body">
+        <div class="q-meta">
+          <span class="q-num" id="qNum">Question 1 of 6</span>
+          <span class="q-tag" id="qTag">Mental Health</span>
+        </div>
+        <div class="q-text" id="qText">Loading...</div>
+        <div class="opts" id="opts"></div>
+      </div>
+      <div class="q-footer">
+        <div class="dots" id="dots"></div>
+        <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+          Next <span>→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- THINKING SCREEN -->
+    <div id="thinkScreen">
+      <div class="think-icon">🧠</div>
+      <div class="think-title">Analysing your responses…</div>
+      <div class="think-sub">Our AI is building your personalised mental health report</div>
+      <div class="think-steps">
+        <div class="think-step" id="ts1"><span class="step-icon">📊</span> Reading your answers</div>
+        <div class="think-step" id="ts2"><span class="step-icon">🔍</span> Identifying patterns</div>
+        <div class="think-step" id="ts3"><span class="step-icon">💡</span> Generating insights</div>
+        <div class="think-step" id="ts4"><span class="step-icon">👩‍⚕️</span> Matching your therapist</div>
+      </div>
+    </div>
+
+    <!-- REPORT SCREEN -->
+    <div id="reportScreen">
+      <div class="report-header">
+        <div class="rh-inner">
+          <div class="rh-eyebrow">Your Daily Report · <span id="rDate"></span></div>
+          <div class="rh-title" id="rTitle">Mental Wellness Report</div>
+          <div class="rh-sub" id="rSub">Based on your 6 responses today</div>
+          <div class="score-row" id="scoreRow"></div>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="section">
+          <div class="sec-label">📋 Overview</div>
+          <div class="sec-text" id="rOverview"></div>
+        </div>
+        <div class="section">
+          <div class="sec-label">💡 Personalised Insight</div>
+          <div class="insight-box" id="rInsight"></div>
+        </div>
+        <div class="section">
+          <div class="sec-label">🏷️ Key Areas</div>
+          <div class="tags-row" id="rTags"></div>
+        </div>
+        <div class="section">
+          <div class="sec-label">✅ Recommended Actions</div>
+          <div class="sec-text" id="rActions"></div>
+        </div>
+        <div class="section">
+          <div class="sec-label">🤖 AI Therapist Assignment</div>
+          <div class="ai-assign-box" id="aiAssignBox">
+            <div class="ai-assign-thinking" id="aiThinking">
+              <div class="ai-spinner"></div>
+              <div class="ai-think-text">AI is analysing your profile and selecting the best therapist for you…</div>
+            </div>
+            <div class="therapist-match" id="therapistReveal" style="display:none">
+              <div class="tm-ava" id="tmAva">👩‍⚕️</div>
+              <div>
+                <div class="tm-label">✨ AI assigned · Perfect match</div>
+                <div class="tm-name" id="tmName">Dr. Shivani Singh</div>
+                <div class="tm-spec" id="tmSpec">Anxiety & Stress</div>
+              </div>
+              <button class="tm-btn" id="tmBtn">Book Session</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-dashboard" onclick="goToDashboard()">
+          Open My Dashboard →
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// AI-POWERED DYNAMIC QUESTIONS — generated fresh every session
+// ════════════════════════════════════════════════════
+
+// ── THERAPIST POOL ──────────────────────────────────────────
+const THERAPISTS = [
+  {id:'t1', name:'Dr. Shivani Singh', ava:'👩‍⚕️', spec:'Anxiety & Stress',   tags:['anxiety','stress']},
+  {id:'t2', name:'Dr. Rahul Rai',     ava:'👨‍⚕️', spec:'Depression & CBT',   tags:['depression','unmotivated']},
+  {id:'t3', name:'Dr. Priya Sharma',  ava:'👩‍⚕️', spec:'Relationships',       tags:['social','relationship','conflict']},
+  {id:'t4', name:'Dr. Arjun Mehta',   ava:'👨‍⚕️', spec:'Trauma & PTSD',      tags:['trauma','disturbed','panic']},
+];
+
+// ── STATE ──────────────────────────────────────────────────
+const TOTAL_Q = 6;
+let sessionQuestions = [];   // filled by AI on load
+let current = 0;
+let answers  = [];
+let scores   = {};
+
+// ── CALL BACKEND PROXY ─────────────────────────────────────
+async function callClaude(userPrompt, maxTokens = 1200) {
+  const res = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+  if (!res.ok) throw new Error(`Server error ${res.status}`);
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data.content[0].text.trim().replace(/```json|```/g, '').trim();
+}
+
+// ── LOAD AI QUESTIONS ──────────────────────────────────────
+async function loadAIQuestions() {
+  const today = new Date().toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long'});
+  const raw = await callClaude(`You are a compassionate mental health assistant for MindEase, a wellness platform.
+Generate ${TOTAL_Q} unique, thoughtful daily mental wellness check-in questions for a user on ${today}.
+
+Rules:
+- Cover these categories evenly: Mental Health (2), Personality (2), Lifestyle (2)
+- Each question has exactly 4 answer options
+- Options must be short (max 8 words), vivid, and start with a relevant emoji
+- Questions must feel warm, human, and slightly poetic — never clinical
+- Every session should feel fresh — avoid clichéd questions
+- Assign score weights: each option has a "score" object with keys from: wellbeing, stress, anxiety, depression, energy, social, trauma, relationship, mindful (values 1-10)
+
+Return ONLY a valid JSON array, no markdown:
+[
+  {
+    "id": "q1",
+    "cat": "mh",
+    "catLabel": "Mental Health",
+    "text": "Question text here?",
+    "opts": [
+      {"l": "😄 Option A text", "v": "value_a", "score": {"wellbeing": 8, "energy": 7}},
+      {"l": "🙂 Option B text", "v": "value_b", "score": {"wellbeing": 5}},
+      {"l": "😔 Option C text", "v": "value_c", "score": {"stress": 6}},
+      {"l": "😰 Option D text", "v": "value_d", "score": {"stress": 9, "anxiety": 8}}
+    ]
+  }
+]
+
+Categories: use "mh" for Mental Health, "ps" for Personality, "ls" for Lifestyle.`);
+  return JSON.parse(raw);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init() {
+  const today = new Date().toDateString();
+  const quizDate = sessionStorage.getItem('me_quiz_date');
+
+  // Already completed quiz today — skip straight to report
+  if (quizDate === today && sessionStorage.getItem('me_report')) {
+    document.getElementById('qScreen').style.display = 'none';
+    document.getElementById('thinkScreen').style.display = 'none';
+    const report = JSON.parse(sessionStorage.getItem('me_report'));
+    showReport(report);
+    return;
+  }
+
+  // Fresh session: clear stale data
+  sessionStorage.removeItem('me_report');
+  sessionStorage.removeItem('me_quiz_date');
+  sessionStorage.removeItem('me_therapist');
+
+  document.getElementById('qScreen').style.display = 'block';
+  document.getElementById('thinkScreen').style.display = 'none';
+  document.getElementById('reportScreen').style.display = 'none';
+
+  // Show loading state while AI generates questions
+  document.getElementById('qText').textContent = 'Preparing your personalised check-in…';
+  document.getElementById('opts').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      ${[1,2,3,4].map(()=>`<div style="height:48px;border-radius:13px;background:linear-gradient(90deg,rgba(184,216,237,.25) 25%,rgba(184,216,237,.45) 50%,rgba(184,216,237,.25) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;"></div>`).join('')}
+    </div>`;
+  document.getElementById('btnNext').classList.remove('on');
+
+  try {
+    sessionQuestions = await loadAIQuestions();
+    // Ensure we have exactly TOTAL_Q questions
+    if (!sessionQuestions || sessionQuestions.length < TOTAL_Q) {
+      throw new Error('Not enough questions generated');
+    }
+    sessionQuestions = sessionQuestions.slice(0, TOTAL_Q);
+  } catch(e) {
+    console.warn('AI questions failed, using fallback:', e);
+    sessionQuestions = getFallbackQuestions();
+  }
+
+  renderQuestion();
+}
+
+// Fallback static questions if AI call fails
+function getFallbackQuestions() {
+  return [
+    {id:'f1',cat:'mh',catLabel:'Mental Health',text:'How would you describe your emotional state this week?',opts:[
+      {l:'😄 Positive and energised',v:'positive',score:{wellbeing:8,energy:8}},
+      {l:'🙂 Okay — some ups and downs',v:'neutral',score:{wellbeing:5}},
+      {l:'😔 Frequently low or unmotivated',v:'low',score:{wellbeing:2,stress:6}},
+      {l:'😰 Overwhelmed most days',v:'overwhelmed',score:{stress:9,anxiety:8}}
+    ]},
+    {id:'f2',cat:'mh',catLabel:'Mental Health',text:'How often do you worry about things outside your control?',opts:[
+      {l:'🧘 Rarely — I stay present',v:'rarely',score:{anxiety:1}},
+      {l:'🤔 Sometimes — a few times a week',v:'sometimes',score:{anxiety:4}},
+      {l:'😟 Often — it disrupts my focus',v:'often',score:{anxiety:7}},
+      {l:'😱 Almost always',v:'always',score:{anxiety:10,stress:8}}
+    ]},
+    {id:'f3',cat:'ps',catLabel:'Personality',text:'How do you recharge after a tiring day?',opts:[
+      {l:'🏡 Alone time and quiet',v:'introvert',score:{}},
+      {l:'🎉 Socialising with friends',v:'extrovert',score:{social:7}},
+      {l:'🌿 Nature walks or exercise',v:'nature',score:{wellbeing:6}},
+      {l:'🎮 Entertainment and hobbies',v:'hobbies',score:{wellbeing:5}}
+    ]},
+    {id:'f4',cat:'ps',catLabel:'Personality',text:'How comfortable are you asking for help?',opts:[
+      {l:'😊 Very comfortable',v:'open',score:{social:8,wellbeing:6}},
+      {l:'🤏 Only with trusted people',v:'selective',score:{social:4}},
+      {l:'😬 Prefer to manage alone',v:'independent',score:{}},
+      {l:'🙅 I never ask for help',v:'closed',score:{stress:6,depression:4}}
+    ]},
+    {id:'f5',cat:'ls',catLabel:'Lifestyle',text:'How would you describe your sleep this week?',opts:[
+      {l:'😴 Solid — 7-9 hours, rested',v:'good',score:{wellbeing:7,energy:7}},
+      {l:'⏰ Inconsistent — varies a lot',v:'inconsistent',score:{stress:4}},
+      {l:'🌙 Too little — tired all day',v:'poor',score:{depression:5}},
+      {l:'😨 Troubled — nightmares or broken',v:'disturbed',score:{anxiety:7,trauma:6}}
+    ]},
+    {id:'f6',cat:'ls',catLabel:'Lifestyle',text:'How connected do you feel to people around you?',opts:[
+      {l:'💞 Very — strong support network',v:'connected',score:{social:9,wellbeing:7}},
+      {l:'🤝 Somewhat — a few close people',v:'some',score:{social:5}},
+      {l:'😶 Isolated — I feel alone',v:'isolated',score:{depression:8}},
+      {l:'😤 Conflicted — relationships are stressful',v:'conflict',score:{stress:7,relationship:7}}
+    ]}
+  ];
+}
+
+// ── RENDER QUESTION ──────────────────────────────────────────
+function renderQuestion() {
+  const q = sessionQuestions[current];
+  const pct = (current / TOTAL_Q) * 100;
+
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('qNum').textContent = `Question ${current+1} of ${TOTAL_Q}`;
+
+  const tagEl = document.getElementById('qTag');
+  tagEl.textContent = q.catLabel;
+  tagEl.className = 'q-tag ' + {mh:'tag-mh',ps:'tag-ps',ls:'tag-ls',br:'tag-br'}[q.cat];
+
+  document.getElementById('qText').textContent = q.text;
+
+  // Render options
+  const optsEl = document.getElementById('opts');
+  optsEl.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-key">${letters[i]}</span><span>${opt.l}</span>`;
+    btn.onclick = () => selectOpt(btn, i);
+    optsEl.appendChild(btn);
+  });
+
+  // Render dots
+  const dotsEl = document.getElementById('dots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < TOTAL_Q; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < current ? ' done' : i === current ? ' active' : '');
+    dotsEl.appendChild(d);
+  }
+
+  // Reset next button
+  const btn = document.getElementById('btnNext');
+  btn.classList.remove('on');
+  btn.querySelector('span').textContent = current < TOTAL_Q-1 ? '→' : '✓';
+  btn.childNodes[0].textContent = current < TOTAL_Q-1 ? 'Next ' : 'See My Report ';
+
+  // Animate card in
+  const card = document.getElementById('mainCard');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'card-in .4s cubic-bezier(.34,1.2,.64,1) both';
+}
+
+function selectOpt(btn, idx) {
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  btn.classList.add('sel');
+  btn.dataset.idx = idx;
+  document.getElementById('btnNext').classList.add('on');
+}
+
+function nextQuestion() {
+  const selBtn = document.querySelector('.opt.sel');
+  if (!selBtn) return;
+
+  const q   = sessionQuestions[current];
+  const idx = parseInt(selBtn.dataset.idx);
+  const opt = q.opts[idx];
+
+  // Accumulate scores
+  if (opt.score) {
+    Object.entries(opt.score).forEach(([k,v]) => {
+      scores[k] = (scores[k] || 0) + v;
+    });
+  }
+  answers.push({ qText: q.text, chosen: opt.l, value: opt.v });
+
+  current++;
+
+  if (current < TOTAL_Q) {
+    renderQuestion();
+  } else {
+    startAnalysis();
+  }
+}
+
+// ── ANALYSIS + AI ────────────────────────────────────────────
+async function startAnalysis() {
+  document.getElementById('qScreen').style.display = 'none';
+  document.getElementById('thinkScreen').style.display = 'block';
+  document.getElementById('progFill').style.width = '100%';
+  document.getElementById('navBadge').textContent = 'Generating Report…';
+
+  // Animate thinking steps
+  const steps = ['ts1','ts2','ts3','ts4'];
+  for (let i = 0; i < steps.length; i++) {
+    await delay(800);
+    document.getElementById(steps[i]).classList.add('active');
+    if (i > 0) document.getElementById(steps[i-1]).classList.add('complete');
+  }
+
+  // Build prompt
+  const answerText = answers.map((a,i) =>
+    `Q${i+1}: "${a.qText}"\nAnswer: ${a.chosen}`
+  ).join('\n\n');
+
+  const scoreText = Object.entries(scores)
+    .filter(([,v])=>v>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([k,v])=>`${k}: ${v}`)
+    .join(', ');
+
+  const prompt = `You are a compassionate mental health assistant for MindEase, a wellness platform.
+A user completed their daily mental health check-in. Here are their answers:
+
+${answerText}
+
+Computed dimension scores (higher = more prominent): ${scoreText}
+
+Write a warm, professional mental health report. Return ONLY a JSON object (no markdown, no backticks) with these exact keys:
+{
+  "title": "A short personalised report title (e.g. 'Navigating a Stressful Week')",
+  "subtitle": "One line summary of their state today",
+  "overview": "2-3 sentences: an empathetic overview of their mental state based on their answers. Be specific to their responses.",
+  "insight": "1-2 sentences: a sharp, personalised insight — something they might not have noticed about themselves. Make it feel like it was written just for them.",
+  "tags": ["3 to 5 short keyword tags describing their state, e.g. 'High Anxiety', 'Sleep Issues', 'Social Isolation'"],
+  "actions": "3 short actionable recommendations as a single string, each on a new line starting with a relevant emoji and dash. Tailor to their specific answers.",
+  "wellbeingScore": <number 1-100 based on answers>,
+  "stressScore": <number 1-100>,
+  "energyScore": <number 1-100>,
+  "therapistTag": "one of: anxiety | depression | relationship | trauma — best match based on answers"
+}`;
+
+  let report = null;
+  try {
+    const raw = await callClaude(prompt, 1000);
+    report = JSON.parse(raw);
+  } catch(e) {
+    console.warn('AI report failed, using fallback:', e);
+    report = generateFallbackReport();
+  }
+
+  // Save to session
+  sessionStorage.setItem('me_quiz_date', new Date().toDateString());
+  sessionStorage.setItem('me_report', JSON.stringify(report));
+
+  await delay(600);
+  showReport(report);
+}
+
+function generateFallbackReport() {
+  const topScores = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top = topScores[0]?.[0] || 'wellbeing';
+  const tagMap = {
+    anxiety:    {title:'Managing a Busy Mind', sub:'Your responses point to elevated anxiety levels today.', therapistTag:'anxiety'},
+    depression: {title:'Navigating Low Energy', sub:'Your answers suggest you may be feeling emotionally drained.', therapistTag:'depression'},
+    stress:     {title:'Under Pressure Today', sub:'You are carrying a significant stress load right now.', therapistTag:'anxiety'},
+    social:     {title:'Seeking Connection', sub:'Your wellbeing is tied to your relationships today.', therapistTag:'relationship'},
+    trauma:     {title:'Processing Difficult Feelings', sub:'Some deeper emotional patterns came through in your answers.', therapistTag:'trauma'},
+    wellbeing:  {title:'A Balanced Day', sub:'Your responses suggest relatively good overall wellbeing.', therapistTag:'anxiety'},
+  };
+  const m = tagMap[top] || tagMap.wellbeing;
+  const wb = Math.max(20, Math.min(95, (scores.wellbeing||0)*5 + 50));
+  const st = Math.max(10, Math.min(95, (scores.stress||0)*6));
+  const en = Math.max(20, Math.min(95, (scores.energy||0)*6 + 40));
+  return {
+    title: m.title, subtitle: m.sub,
+    overview: `Based on your check-in today, your primary emotional theme is ${top}. Your answers reveal how you've been managing daily stressors and your emotional resources. This is a good moment to pause and be gentle with yourself.`,
+    insight: `You show awareness of your emotional state — that self-awareness is itself a strength. Noticing patterns is the first step toward change.`,
+    tags: [top.charAt(0).toUpperCase()+top.slice(1), 'Daily Check-in', 'Self-Aware'],
+    actions: `🧘 Practice 5 minutes of deep breathing today\n💬 Reach out to one person you trust\n📓 Write down 3 things you're grateful for tonight`,
+    wellbeingScore: wb, stressScore: st, energyScore: en,
+    therapistTag: m.therapistTag
+  };
+}
+
+function showReport(report) {
+  document.getElementById('thinkScreen').style.display = 'none';
+  document.getElementById('reportScreen').style.display = 'block';
+  document.getElementById('navBadge').textContent = 'Your Report';
+
+  document.getElementById('rDate').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'short'});
+  document.getElementById('rTitle').textContent = report.title || 'Mental Wellness Report';
+  document.getElementById('rSub').textContent   = report.subtitle || '';
+  document.getElementById('rOverview').textContent = report.overview || '';
+  document.getElementById('rInsight').textContent  = report.insight  || '';
+  document.getElementById('rActions').innerHTML = (report.actions||'').split('\n').map(a=>
+    a.trim() ? `<div style="margin-bottom:7px">${a}</div>` : ''
+  ).join('');
+
+  // Score chips
+  document.getElementById('scoreRow').innerHTML = [
+    {lbl:'Wellbeing', val: report.wellbeingScore||'—'},
+    {lbl:'Stress',    val: report.stressScore||'—'},
+    {lbl:'Energy',    val: report.energyScore||'—'},
+  ].map(s=>`<div class="score-chip"><div class="sc-val">${s.val}</div><div class="sc-lbl">${s.lbl}</div></div>`).join('');
+
+  // Tags
+  document.getElementById('rTags').innerHTML = (report.tags||[]).map(t=>
+    `<span class="report-tag">${t}</span>`
+  ).join('');
+
+  // Therapist
+  // Score-based therapist matching
+  // Build weighted scores per dimension
+  const dimScores = {
+    anxiety:      (scores.anxiety||0) + (scores.stress||0)*0.5,
+    depression:   (scores.depression||0) + (scores.energy||0 < 0 ? 3 : 0),
+    relationship: (scores.social||0) + (scores.relationship||0),
+    trauma:       (scores.trauma||0),
+  };
+  if (report.therapistTag) {
+    dimScores[report.therapistTag] = (dimScores[report.therapistTag]||0) + 5;
+  }
+
+  // Convert scores to weighted probabilities so even lower-scored therapists can be picked
+  const dims = Object.entries(dimScores).map(([k,v])=>({k, v: Math.max(v,1)}));
+  const total = dims.reduce((s,d)=>s+d.v, 0);
+  let rand = Math.random() * total, chosen = dims[0].k;
+  for (const d of dims) { rand -= d.v; if (rand <= 0) { chosen = d.k; break; } }
+
+  const tagToTherapist = {anxiety:0, depression:1, relationship:2, trauma:3};
+  const tIdx = tagToTherapist[chosen] ?? Math.floor(Math.random()*4);
+  const t = THERAPISTS[tIdx];
+  // Delayed AI therapist reveal
+  setTimeout(() => {
+    document.getElementById('aiThinking').style.display = 'none';
+    const reveal = document.getElementById('therapistReveal');
+    reveal.style.display = 'flex';
+    document.getElementById('tmAva').textContent  = t.ava;
+    document.getElementById('tmName').textContent = t.name;
+    document.getElementById('tmSpec').textContent = t.spec;
+    document.getElementById('tmBtn').onclick = () => {
+      sessionStorage.setItem('me_therapist', JSON.stringify(t));
+      window.location.href = `chat.html?id=${encodeURIComponent(t.id)}&name=${encodeURIComponent(t.name)}&ava=${encodeURIComponent(t.ava)}&spec=${encodeURIComponent(t.spec)}`;
+    };
+  }, 2200);
+
+  sessionStorage.setItem('me_therapist', JSON.stringify(t));
+}
+
+function goToDashboard() {
+  window.location.href = 'dashboard.html';
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── START ─────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  if (!sessionStorage.getItem('me_token')) {
+    window.location.href = 'sign.html';
+    return;
+  }
+  init(); // async — loads AI questions then renders
+});
+</script>
+</body>
+</html>

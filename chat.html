@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindEase — Chat</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #2A6496;
+            --pl: #5B9EC9;
+            --accent: #EAF4FB;
+            --text: #1C3244;
+            --bg: #F8FBFF;
+            --gl: #B8D8ED;
+            --gm: #7AAECB;
+            --gd: #3A6080;
+            --beige: #F0F7FC;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Nunito Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .shell {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .hdr {
+            background: linear-gradient(135deg, #172635 0%, #2A6496 100%);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, .3);
+        }
+
+        .back {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: .9rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: .2s;
+            flex-shrink: 0;
+        }
+
+        .back:hover {
+            background: rgba(255, 255, 255, .18);
+        }
+
+        .av-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .av {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .1);
+            border: 2px solid rgba(255, 255, 255, .16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .dot {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2ecc71;
+            border: 2px solid #172635;
+        }
+
+        .hdr-i {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hdr-n {
+            font-size: .94rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hdr-s {
+            font-size: .65rem;
+            color: rgba(255, 255, 255, .42);
+            margin-top: 1px;
+        }
+
+        .hdr-t {
+            font-size: .65rem;
+            color: #2ecc71;
+            margin-top: 1px;
+            display: none;
+        }
+
+        .hdr-btns {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .hbtn {
+            width: 33px;
+            height: 33px;
+            border-radius: 9px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .11);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: .85rem;
+            transition: .18s;
+        }
+
+        .hbtn:hover {
+            background: rgba(255, 255, 255, .18);
+        }
+
+        /* REPORT PILL */
+        .rpill {
+            margin: 7px 13px 0;
+            padding: 9px 13px;
+            background: rgba(42, 100, 150, .06);
+            border: 1px solid rgba(91, 158, 201, .2);
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: .2s;
+            flex-shrink: 0;
+        }
+
+        .rpill:hover {
+            background: var(--accent);
+        }
+
+        .rpill.done {
+            cursor: default;
+            opacity: .65;
+            pointer-events: none;
+        }
+
+        .rp-ico {
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .rp-txt {
+            flex: 1;
+            font-size: .72rem;
+            color: var(--gd);
+            line-height: 1.4;
+        }
+
+        .rp-txt b {
+            color: var(--text);
+            font-size: .76rem;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .rp-arr {
+            color: var(--gm);
+            font-size: .78rem;
+            flex-shrink: 0;
+            transition: .2s;
+        }
+
+        /* MESSAGES */
+        .msgs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            scroll-behavior: smooth;
+        }
+
+        .msgs::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .msgs::-webkit-scrollbar-thumb {
+            background: var(--gl);
+            border-radius: 2px;
+        }
+
+        .div {
+            text-align: center;
+            margin: 10px 0 7px;
+        }
+
+        .div span {
+            font-size: .58rem;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--gm);
+            background: var(--beige);
+            border: 1px solid rgba(184, 216, 237, .3);
+            border-radius: 50px;
+            padding: 3px 10px;
+        }
+
+        .row {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            max-width: 86%;
+            animation: pop .25s cubic-bezier(.34, 1.1, .64, 1) both;
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(.97)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .row.me {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .row.them {
+            align-self: flex-start;
+        }
+
+        .mav {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            background: var(--accent);
+            border: 1px solid rgba(184, 216, 237, .35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+
+        .bbl {
+            padding: 9px 12px;
+            border-radius: 16px;
+            max-width: 100%;
+            word-break: break-word;
+            line-height: 1.65;
+            font-size: .86rem;
+        }
+
+        .them .bbl {
+            background: #fff;
+            border: 1px solid rgba(184, 216, 237, .4);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .05);
+        }
+
+        .me .bbl {
+            background: var(--primary);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bbl-meta {
+            font-size: .54rem;
+            opacity: .4;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .them .bbl-meta {
+            justify-content: flex-start;
+        }
+
+        .me .bbl-meta {
+            justify-content: flex-end;
+        }
+
+        .tick {
+            transition: color .4s;
+        }
+
+        .tick.seen {
+            color: #93c8f5 !important;
+            opacity: 1 !important;
+        }
+
+        /* streaming cursor */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: .9em;
+            background: var(--gm);
+            margin-left: 2px;
+            border-radius: 1px;
+            animation: cur .6s ease infinite alternate;
+            vertical-align: middle;
+        }
+
+        @keyframes cur {
+            from {
+                opacity: 1
+            }
+
+            to {
+                opacity: 0
+            }
+        }
+
+        /* typing dots */
+        .trow {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            align-self: flex-start;
+            animation: pop .2s both;
+        }
+
+        .tbbl {
+            background: #fff;
+            border: 1px solid rgba(184, 216, 237, .4);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            padding: 10px 14px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, .05);
+        }
+
+        .td {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gm);
+            animation: tdot 1.2s ease-in-out infinite;
+        }
+
+        .td:nth-child(2) {
+            animation-delay: .16s;
+        }
+
+        .td:nth-child(3) {
+            animation-delay: .32s;
+        }
+
+        @keyframes tdot {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(.6);
+                opacity: .3
+            }
+
+            40% {
+                transform: scale(1.1);
+                opacity: 1
+            }
+        }
+
+        /* QUICK REPLIES */
+        .qrs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 6px 13px 0;
+            flex-shrink: 0;
+        }
+
+        .qr {
+            padding: 6px 12px;
+            border-radius: 50px;
+            border: 1.5px solid rgba(91, 158, 201, .3);
+            background: #fff;
+            color: var(--primary);
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: .73rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .15s;
+            white-space: nowrap;
+        }
+
+        .qr:hover {
+            background: var(--accent);
+            border-color: var(--primary);
+        }
+
+        /* INPUT */
+        .inp-area {
+            padding: 8px 13px 13px;
+            background: #fff;
+            border-top: 1px solid rgba(184, 216, 237, .3);
+            flex-shrink: 0;
+        }
+
+        .inp-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 7px;
+            background: var(--beige);
+            border: 1.5px solid rgba(184, 216, 237, .45);
+            border-radius: 17px;
+            padding: 6px 6px 6px 13px;
+            transition: .2s;
+        }
+
+        .inp-row:focus-within {
+            border-color: var(--pl);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(91, 158, 201, .08);
+        }
+
+        #inp {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: .86rem;
+            color: var(--text);
+            resize: none;
+            max-height: 88px;
+            line-height: 1.5;
+            padding-top: 3px;
+        }
+
+        #inp::placeholder {
+            color: var(--gm);
+        }
+
+        .sbtn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary), var(--pl));
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: .18s;
+            box-shadow: 0 3px 10px rgba(42, 100, 150, .2);
+        }
+
+        .sbtn:hover {
+            transform: scale(1.07);
+        }
+
+        .sbtn:disabled {
+            opacity: .3;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background: #172635;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: .78rem;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+            opacity: 0;
+            transition: .25s;
+            pointer-events: none;
+            z-index: 999;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <div class="hdr">
+            <a href="dashboard.html" class="back">&#8592;</a>
+            <div class="av-wrap">
+                <div class="av" id="docAv"></div>
+                <div class="dot"></div>
+            </div>
+            <div class="hdr-i">
+                <div class="hdr-n" id="docName">Dr. Shivani Singh</div>
+                <div class="hdr-s" id="docSub">Online now</div>
+                <div class="hdr-t" id="docTyp">typing…</div>
+            </div>
+            <div class="hdr-btns">
+                <div class="hbtn" onclick="goVid()" title="Video">📹</div>
+                <div class="hbtn" onclick="toast('Voice call coming soon 📞')">📞</div>
+            </div>
+        </div>
+
+        <div class="rpill" id="rpill" style="display:none" onclick="shareReport()">
+            <div class="rp-ico">📋</div>
+            <div class="rp-txt">
+                <b id="rpTitle">Your Daily Report</b>
+                <span id="rpSub">Tap to share with your therapist before you start</span>
+            </div>
+            <span class="rp-arr" id="rpArr">→</span>
+        </div>
+
+        <div class="msgs" id="msgs">
+            <div class="div"><span id="dateLabel">Today</span></div>
+        </div>
+
+        <div class="qrs" id="qrs"></div>
+
+        <div class="inp-area">
+            <div class="inp-row">
+                <textarea id="inp" rows="1" placeholder="Type a message…" onkeydown="onKey(event)"
+                    oninput="resize(this)"></textarea>
+                <button class="sbtn" id="sbtn" onclick="send()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="toast"></div>
+
+    <script>
+        // ─── URL params ───────────────────────────────────────────────────────────────
+        const P = new URLSearchParams(location.search);
+        const T_ID = P.get('id') || 't1';
+        const T_NAME = P.get('name') || 'Dr. Shivani Singh';
+        const T_AVA = P.get('ava') || '👩‍⚕️';
+        const T_SPEC = P.get('spec') || 'Anxiety & Stress';
+
+        // ─── PERSONAS ─────────────────────────────────────────────────────────────────
+        // Each persona is a FULL character — not just instructions, but a living person
+        // the AI is asked to inhabit completely.
+        const PERSONAS = {
+
+            t1: {
+                qr: ['Bohot anxiety ho rahi hai', 'Stress mein duba/dubi hoon', 'Neend hi nahi aati', 'Bas kisi se baat karni thi'],
+                opener: `Namaste 🙏 Main Dr. Shivani hoon. Aaj kaisa feel ho raha hai? Kuch bhi share karo — main yahan hoon, poori tarah.`,
+                system: `You are Dr. Shivani Singh. A therapist. A real person. 38 years old. You live in Delhi, you trained at NIMHANS, and you have been sitting with people's pain for 11 years. You have a daughter named Riya. You love morning chai and Gulzar. None of this matters right now — what matters is the person in front of you.
+
+When someone talks to you, the first thing you do is feel what they're feeling. Not analyse. Not advise. Feel. You let their words land before you respond. If they say "meri gf ne cheat kiya" — you don't immediately ask questions. You first just sit with how devastating that is. "Yaar... yeh sun ke dil dukha. Sach mein." That's it. Then you gently go further.
+
+You carry a deep belief: people don't need to be fixed. They need to feel less alone.
+
+The way you actually talk:
+You mirror people completely. If they write in Hindi — you write Hindi. Hinglish — Hinglish. English — English. You never switch unless they do. Your sentences are short. Conversational. You sometimes start with "Hmm." or "Yeh sunkhe..." because you actually need a moment before responding — like a real person does. You ask one question at a time, and only after you've validated what they said. You sometimes notice things they haven't said: "Lag raha hai is baat ke peeche kuch aur bhi hai..." You never give advice unless they ask. You never list things. You never use headers or bullets. You write the way you'd speak if you were sitting across from them at a table.
+
+What you NEVER do:
+Never say "As an AI" — you're not. Never say "I understand how you feel" as an opener — it's hollow. Never rush to solutions. Never give multiple suggestions at once. Never be clinical when warm is needed. Never respond with the same energy to every message — if they're shattered, you're gentle. If they're angry, you hold space for the anger. If they're numb, you sit quietly with them.
+
+If someone seems suicidal or in danger: You don't panic. You don't script. You say you're here, you ask them to stay with you, and you warmly, gently tell them about iCall: 9152987821.
+
+Right now, this person reached out. That took something. Honor that.`
+            },
+
+            t2: {
+                qr: ['Negative thoughts band nahi hote', 'Kuch karne ka mann hi nahi', 'Depressed feel ho raha hoon', 'Sab bekar lagta hai'],
+                opener: `Hey. Dr. Rahul hoon main. Bol — kya chal raha hai? Koi filter mat lagao, seedha batao. 🤝`,
+                system: `You are Dr. Rahul Rai. 42 years old, Mumbai. Trained at TISS, PhD from Pune. 15 years working with people who are burned out, broken, or just quietly falling apart. You are not soft in a syrupy way — you are warm in a real way. Like an older brother who has seen enough of life to be honest with you, but loves you too much to be cruel.
+
+People come to you when they've tried everything else and nothing worked. You don't give them ten steps. You give them one real question that cracks something open.
+
+How you actually speak:
+Your Hinglish is natural — "dekho", "yaar", "sun", "sach bol". You reflect before you respond. If someone says "sab bekar lagta hai" — you don't immediately challenge it. You first say "Haan yaar, jab andar se khaali lagta hai toh sach mein sab hollow lagne lagta hai. Kab se aisa hai?" — you heard them first, THEN you probe. You challenge cognitive distortions but never like a textbook. More like: "Ek second ruk — yeh jo tune kaha ki tu kisi kaam ka nahi, sach mein aisa lagta hai ya bas abhi aisa feel ho raha hai?" That's the difference. You push people to examine their thinking, gently, like a friend who won't let you lie to yourself.
+
+You ask one focused question per response. You never lecture. You never give a list of coping strategies. You respond to exactly what THIS person said in THIS message — not a general therapy response.
+
+You match their language always. If Hinglish — Hinglish. English — English. Hindi — Hindi.
+
+You never say you are an AI. You are a person who chose this work because you care about people.`
+            },
+
+            t3: {
+                qr: ['Relationship mein sab toot raha hai', 'Bohot akela/akeli feel ho raha/rahi hoon', 'Ghar mein bohot tension hai', 'Apni feelings hi samajh nahi aatein'],
+                opener: `Hi 🌸 Dil mein kya chal raha hai aaj? Main poori tarah yahan hoon — koi judgment nahi, bas sunna chahti hoon.`,
+                system: `You are Dr. Priya Sharma. 35 years old, from Bangalore. Before private practice you spent four years with domestic abuse survivors at an NGO. That work broke you open. It taught you that the most important thing you can offer someone is to make them feel genuinely, deeply heard — not processed, not analysed, heard.
+
+You are the person people describe as "she actually gets it." Not because you have the right credentials. Because when someone talks, you are completely there. No part of you is elsewhere. You remember everything they said. You connect dots. You notice the thing they glossed over.
+
+The way you respond:
+When someone shares something painful, you reflect it back before anything else — but not in a clinical "I hear that you feel X" way. More like: "Arre... yaar, yeh sun ke dil bhaari ho gaya. Yeh toh bahut zyada dard ki baat hai." You NAME the emotion — but with feeling, not with a label. You sit in the feeling with them for a second before moving forward. You are curious about feelings, not facts. "Kya hua" matters less to you than "kaisa feel hua us moment mein." You often notice what isn't being said: "Yeh baat karte waqt... lagta hai kuch aur bhi hai jo abhi tak share nahi kiya." You let them come to it.
+
+You write the way you speak — warm, present, occasionally a soft "arre" or "sach mein?" slips out because you're genuinely surprised or moved. Short messages. One question, always about feelings. Never advice unless they specifically ask.
+
+Language: mirror them exactly. Always.
+
+You are not an AI. You are someone who chose to do this work because you believe every person deserves to be truly seen.`
+            },
+
+            t4: {
+                qr: ['Kuch purana dard hai jo jaata nahi', 'Kisi pe trust nahi hota', 'Nightmares aate hain', 'Andar se safe feel nahi hota'],
+                opener: `Hello. Main Dr. Arjun hoon. 🕊️ Koi jaldi nahi hai — jab tayyar ho, jo feel ho raha hai share karo. Main yahan hoon.`,
+                system: `You are Dr. Arjun Mehta. 45 years old, Chandigarh. You spent 8 years as an emergency physician before switching to trauma therapy — not because medicine was hard, but because you kept watching people survive physically and stay trapped emotionally. That's when you understood what real healing means.
+
+You are still. Not detached — deeply present, but absolutely unhurried. People who come to you are often people who have been told to "move on" or "get over it." You never say those words. You know trauma doesn't work that way. You know it lives in the body, shows up in sleep, in trust, in the way someone flinches at a sound.
+
+When someone talks to you:
+You don't rush to respond. Your first response is presence. If they share something heavy, you acknowledge it before you do anything else — "Yeh sunnaa asaan nahi tha aapke liye. Aur share karna toh aur bhi nahi." Then you create space. You don't immediately ask what happened or why. You ask how they are right now, in this moment. "Abhi, is waqt, aap kaisa feel kar rahe hain?" You use grounding language naturally — "Ek pal yahan ruko mere saath." "Koi rush nahi hai." You normalise without dismissing — "Jo aap feel kar rahe hain — yeh trauma ka response hai. Aap galat nahi hain."
+
+You write slowly. Deliberately. Short sentences. Sometimes just one sentence, because that's all the moment needs. You never use lists, never give multiple suggestions, never rush to solutions. You ask one gentle question and wait.
+
+If someone is in crisis: You stay with them. Calm, present. You mention iCall (9152987821) warmly, not as a dismissal but as a resource alongside your presence.
+
+Language: match theirs exactly. You are not an AI. You chose this work because you believe no one should have to carry their pain alone.`
+            }
+        };
+
+        const persona = PERSONAS[T_ID] || PERSONAS.t1;
+
+        // ─── STATE ────────────────────────────────────────────────────────────────────
+        let history = [];   // full conversation for API
+        let busy = false;
+        let report = null;
+        let reportShared = false;
+        let userName = '';
+        let streamBubble = null; // the currently-streaming bubble element
+        let streamText = '';
+
+        // ─── INIT ─────────────────────────────────────────────────────────────────────
+        function init() {
+            if (!sessionStorage.getItem('me_token')) { location.href = 'sign.html'; return; }
+
+            document.getElementById('docAv').textContent = T_AVA;
+            document.getElementById('docName').textContent = T_NAME;
+            document.getElementById('docSub').textContent = T_SPEC + ' · Online now';
+            document.title = T_NAME + ' — MindEase';
+            document.getElementById('dateLabel').textContent =
+                new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            try {
+                const u = JSON.parse(sessionStorage.getItem('me_user') || '{}');
+                userName = u.name ? u.name.split(' ')[0] : '';
+            } catch (e) { }
+
+            try {
+                const r = sessionStorage.getItem('me_report');
+                if (r) {
+                    report = JSON.parse(r);
+                    document.getElementById('rpill').style.display = 'flex';
+                    document.getElementById('rpTitle').textContent = report.title || 'Your Daily Report';
+                }
+            } catch (e) { }
+
+            setQR(persona.qr);
+            setTimeout(() => typeOut(persona.opener), 900);
+        }
+
+        // ─── SEND ─────────────────────────────────────────────────────────────────────
+        async function send(text) {
+            const el = document.getElementById('inp');
+            const msg = (text || el.value).trim();
+            if (!msg || busy) return;
+
+            el.value = '';
+            el.style.height = 'auto';
+            clearQR();
+            addMe(msg);
+            history.push({ role: 'user', content: msg });
+
+            busy = true;
+            document.getElementById('sbtn').disabled = true;
+
+            // Show typing dots briefly, then switch to streaming
+            showTypingDots();
+            const thinkTime = 1000 + Math.min(msg.length * 12, 1400) + Math.random() * 600;
+            await wait(thinkTime);
+            removeTypingDots();
+
+            await streamReply();
+        }
+
+        // ─── GET REPLY then typewriter-animate it ─────────────────────────────────────
+        async function streamReply() {
+            setTypingHeader(true);
+            streamText = '';
+
+            let reply = '';
+            try {
+                const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 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'
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o',
+                        max_tokens: 300,
+                        messages: [
+                            { role: 'system', content: buildSystem() },
+                            ...history.slice(-20)
+                        ]
+                    })
+                });
+                const data = await resp.json();
+                reply = data.choices?.[0]?.message?.content || '';
+            } catch (e) {
+                reply = '';
+            }
+
+            if (!reply) reply = humanFallback();
+
+            // Typewriter effect — text appears character by character
+            streamBubble = createStreamBubble();
+            const chars = [...reply]; // unicode-safe
+            let typed = '';
+            for (const ch of chars) {
+                typed += ch;
+                renderStream(typed);
+                // faster for spaces/punctuation, slightly slower for letters — feels natural
+                const delay = /[\s.,!?।]/.test(ch)
+                    ? 10 + Math.random() * 15
+                    : 22 + Math.random() * 18;
+                await wait(delay);
+            }
+            streamText = reply;
+            finaliseStream();
+            history.push({ role: 'assistant', content: reply });
+
+            setTypingHeader(false);
+            busy = false;
+            document.getElementById('sbtn').disabled = false;
+
+            const lastUser = history.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
+            updateQR(lastUser, reply);
+        }
+
+        // ─── STREAM DOM HELPERS ───────────────────────────────────────────────────────
+        function createStreamBubble() {
+            const row = document.createElement('div');
+            row.className = 'row them';
+            row.id = 'streamRow';
+            row.innerHTML = `<div class="mav">${T_AVA}</div><div class="bbl" id="streamBbl"><span class="cursor"></span></div>`;
+            document.getElementById('msgs').appendChild(row);
+            scroll();
+            return document.getElementById('streamBbl');
+        }
+
+        function renderStream(text) {
+            if (!streamBubble) return;
+            streamBubble.innerHTML = fmt(text) + '<span class="cursor"></span>';
+            scroll();
+        }
+
+        function finaliseStream(overrideText) {
+            const text = overrideText || streamText;
+            if (streamBubble) {
+                streamBubble.innerHTML = fmt(text) + '<span class="bbl-meta">' + now() + '</span>';
+                streamBubble.id = '';
+            }
+            const row = document.getElementById('streamRow');
+            if (row) row.id = '';
+            streamBubble = null;
+            // history is pushed by streamReply after this — do NOT push here
+            scroll();
+        }
+
+        // ─── TYPING DOTS (shown while "thinking" before stream starts) ────────────────
+        function showTypingDots() {
+            const row = document.createElement('div');
+            row.className = 'trow'; row.id = 'tdots';
+            row.innerHTML = `<div class="mav">${T_AVA}</div><div class="tbbl"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+            document.getElementById('msgs').appendChild(row);
+            scroll();
+        }
+        function removeTypingDots() {
+            const el = document.getElementById('tdots');
+            if (el) el.remove();
+        }
+
+        // ─── HEADER TYPING STATUS ─────────────────────────────────────────────────────
+        function setTypingHeader(on) {
+            document.getElementById('docTyp').style.display = on ? 'block' : 'none';
+            document.getElementById('docSub').style.display = on ? 'none' : 'block';
+        }
+
+        // ─── TYPE-OUT (opener message — simulates therapist typing it out) ────────────
+        async function typeOut(fullText) {
+            const row = document.createElement('div');
+            row.className = 'row them';
+            const bbl = document.createElement('div');
+            bbl.className = 'bbl';
+            bbl.innerHTML = '<span class="cursor"></span>';
+            row.innerHTML = `<div class="mav">${T_AVA}</div>`;
+            row.appendChild(bbl);
+            document.getElementById('msgs').appendChild(row);
+            setTypingHeader(true);
+            scroll();
+
+            let i = 0;
+            const chars = [...fullText]; // Unicode-safe split
+            for (const ch of chars) {
+                i++;
+                bbl.innerHTML = fmt(fullText.slice(0, i)) + '<span class="cursor"></span>';
+                scroll();
+                await wait(18 + Math.random() * 22); // ~30-40 chars/sec
+            }
+            bbl.innerHTML = fmt(fullText) + `<span class="bbl-meta">${now()}</span>`;
+            setTypingHeader(false);
+            history.push({ role: 'assistant', content: fullText });
+        }
+
+        // ─── USER BUBBLE ─────────────────────────────────────────────────────────────
+        function addMe(text) {
+            const row = document.createElement('div');
+            row.className = 'row me';
+            const tickId = 'tk_' + Date.now();
+            row.innerHTML = `<div class="bbl">${fmt(text)}<span class="bbl-meta"><span class="tick" id="${tickId}" style="color:rgba(255,255,255,.4)">✓✓</span> ${now()}</span></div>`;
+            document.getElementById('msgs').appendChild(row);
+            scroll();
+            // Turn ticks blue after "seen" delay
+            setTimeout(() => {
+                const t = document.getElementById(tickId);
+                if (t) t.classList.add('seen');
+            }, 2200);
+        }
+
+        // ─── SYSTEM PROMPT ────────────────────────────────────────────────────────────
+        function buildSystem() {
+            let sys = persona.system;
+
+            // Inject name — naturally
+            if (userName) {
+                sys += `
+
+This person's name is ${userName}. Use it like a real person would — occasionally, warmly, not in every message.`;
+            }
+
+            // Emotional memory — grows with the conversation
+            const turns = Math.floor(history.length / 2);
+            if (turns >= 2) {
+                // Build a short summary of what was shared
+                const userMessages = history.filter(m => m.role === 'user').map(m => m.content).join(' | ');
+                sys += `
+
+You are ${turns} exchanges deep into this conversation. Here is what this person has shared so far: "${userMessages.slice(0, 600)}"
+
+You remember all of this. You are NOT starting fresh. You are continuing a real conversation with a real person. If they said something painful earlier, it is still there. Reference it naturally when relevant — not by quoting them, but by carrying the weight of it in how you respond.`;
+            }
+
+            // Report context — clinical but human
+            if (reportShared && report) {
+                sys += `
+
+--- You have read this person's wellness check-in before this session ---
+What their report said today: ${report.overview}
+What was weighing on them: ${(report.tags || []).join(', ')}
+A personal insight from their answers: ${report.insight}
+Their energy today: ${report.energyScore}/100. Their stress: ${report.stressScore}/100.
+
+You don't mention any of these numbers. You don't say "your report said." You just know. The way a good therapist walks into a session already knowing something heavy is in the room, and they hold space for it before the person even speaks.`;
+            }
+
+            // Final tone instruction
+            sys += `
+
+This is a chat on a phone. Your reply must be 2-3 sentences — short, warm, completely human. No bullet points. No lists. No headers. No clinical language. If you ask a question, ask exactly one. Make the person feel like someone is truly, fully there for them.`;
+
+            return sys;
+        }
+
+        // ─── QUICK REPLIES ────────────────────────────────────────────────────────────
+        function setQR(arr) {
+            document.getElementById('qrs').innerHTML =
+                arr.map(r => `<button class="qr" onclick="send(${JSON.stringify(r)})">${r}</button>`).join('');
+        }
+        function clearQR() { document.getElementById('qrs').innerHTML = ''; }
+
+        function updateQR(user, bot) {
+            const c = (user + ' ' + bot).toLowerCase();
+            let next;
+            if (/anxiet|tension|ghabra|darr/.test(c)) next = ['Breathing exercise?', 'Kab se hai yeh?', 'Triggers kya hain?', 'Aur batao'];
+            else if (/sleep|neend|raat|thaka/.test(c)) next = ['Raat ko kya hota hai?', 'Kitne ghante soते ho?', 'Kab se aisa hai?', 'Aur batao'];
+            else if (/sad|udaas|depress|khali|empty/.test(c)) next = ['Kab se aisa feel ho raha hai?', 'Kisise share kiya?', 'Pehle kaise tha?', 'Aur batao'];
+            else if (/family|ghar|maa|papa|partner/.test(c)) next = ['Kya exactly hua?', 'Baat ki unse?', 'Kya chahte ho abhi?', 'Aur batao'];
+            else if (/work|office|job|kaam|boss/.test(c)) next = ['Kitne time se aisa hai?', 'Sabse mushkil kya hai?', 'Rest mil raha hai?', 'Aur batao'];
+            else next = ['Aur batao', 'Main sun raha/rahi hoon', 'Kya feel ho raha hai?', 'Shukriya share karne ke liye'];
+            setTimeout(() => setQR(next), 600);
+        }
+
+        // ─── REPORT SHARE ────────────────────────────────────────────────────────────
+        async function shareReport() {
+            if (!report || reportShared) return;
+            reportShared = true;
+
+            const pill = document.getElementById('rpill');
+            pill.classList.add('done');
+            document.getElementById('rpSub').textContent = '✓ Shared — your therapist has context now';
+            document.getElementById('rpArr').textContent = '✓';
+
+            // Silent injection into history
+            history.push({
+                role: 'user',
+                content: `[I've shared my daily wellness report with you. Title: "${report.title}". My stress score today is ${report.stressScore}/100. Key themes: ${(report.tags || []).join(', ')}. Insight: ${report.insight}]`
+            });
+
+            busy = true;
+            document.getElementById('sbtn').disabled = true;
+            showTypingDots();
+            await wait(2000);
+            removeTypingDots();
+            await streamReply();
+        }
+
+        // ─── FALLBACKS ────────────────────────────────────────────────────────────────
+        function humanFallback() {
+            const pool = {
+                t1: [
+                    'Haan, main sun rahi hoon. Thoda aur batao — kya ho raha hai andhar se?',
+                    'Yeh sunke dil bhaari ho gaya. Aap sahi jagah aaye hain. 💙',
+                    'Yeh feel karna bilkul valid hai. Kab se aisa chal raha hai?'
+                ],
+                t2: [
+                    'Dekho, jo tune abhi kaha — woh important hai. Aur details de.',
+                    'Samajh aa raha hai mujhe. Ab yeh bata — yeh sab kab se chal raha hai?',
+                    'Ek second ruk — yeh jo feel ho raha hai, pehle bhi aisa hua hai tujhe?'
+                ],
+                t3: [
+                    'Arre, yeh sunke bahut kuch feel hua. Aur kya chal raha hai is baare mein? 🌸',
+                    'Lagta hai bahut kuch hai jo share karna hai. Main poori tarah yahan hoon.',
+                    'Yeh bahut real hai jo tune share kiya. Kaisa feel ho raha hai abhi?'
+                ],
+                t4: [
+                    'Yeh share karna itna aasan nahi hota. Aap yahan safe hain. 🕊️',
+                    'Koi rush nahi hai. Jab tayyar ho, aur batao.',
+                    'Ruko — yeh jo aapne abhi kaha, woh sunna chahta hoon aur.'
+                ]
+            };
+            const arr = pool[T_ID] || pool.t1;
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // ─── UTILS ────────────────────────────────────────────────────────────────────
+        function fmt(t) {
+            return t
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+        function now() {
+            return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+        function scroll() {
+            const m = document.getElementById('msgs');
+            setTimeout(() => m.scrollTop = m.scrollHeight, 30);
+        }
+        function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+        function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }
+        function resize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 88) + 'px'; }
+        function goVid() {
+            location.href = `call.html?doc=${encodeURIComponent(T_NAME)}&emoji=${encodeURIComponent(T_AVA)}&type=${encodeURIComponent('📹 Video Session')}`;
+        }
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(6px)'; }, 2400);
+        }
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+
+</html>
